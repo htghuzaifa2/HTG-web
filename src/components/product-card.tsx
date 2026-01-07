@@ -56,7 +56,6 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
     <>
       <Card
         className="group/card relative flex h-full w-full flex-col overflow-hidden rounded-xl border border-border/50 bg-card text-card-foreground shadow-md transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/30 hover:-translate-y-1"
-        style={{ transform: 'translateZ(0)' }}
       >
         <Link href={`/product/${productSlug}`} className="flex flex-col h-full" prefetch={true}>
           <div className="relative w-full overflow-hidden bg-gradient-to-b from-background to-muted/30 aspect-square">

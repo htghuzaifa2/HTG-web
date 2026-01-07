@@ -140,7 +140,7 @@ export default function AllProductsClient() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-12 md:py-16 content-fade-in">
+    <div className="container mx-auto px-4 py-12 md:py-16">
       <div ref={topOfProductsRef} className="scroll-mt-20" />
       <h1 className="mb-2 text-center font-headline text-3xl font-bold text-foreground md:text-4xl">
         All Products

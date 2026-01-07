@@ -77,7 +77,7 @@ export default function SearchClient() {
 
 
   return (
-    <div className="container mx-auto px-4 py-12 content-fade-in">
+    <div className="container mx-auto px-4 py-12">
       <h1 className="mb-4 text-center font-headline text-4xl font-bold">
         Search Products
       </h1>
