@@ -16,7 +16,7 @@ export async function fetchProducts({
   sortBy?: string;
   randomize?: boolean;
 }) {
-  let productsToProcess: Product[] = [...productsData];
+  let productsToProcess: Product[] = [...(productsData as unknown as Product[])];
 
   if (category) {
     productsToProcess = productsToProcess.filter(p => p.category.includes(category));
@@ -25,8 +25,8 @@ export async function fetchProducts({
   if (randomize) {
     // Shuffle the array for random order
     for (let i = productsToProcess.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [productsToProcess[i], productsToProcess[j]] = [productsToProcess[j], productsToProcess[i]];
+      const j = Math.floor(Math.random() * (i + 1));
+      [productsToProcess[i], productsToProcess[j]] = [productsToProcess[j], productsToProcess[i]];
     }
   } else {
     // Sorting logic based on sortBy parameter
@@ -48,7 +48,7 @@ export async function fetchProducts({
         break;
     }
   }
-  
+
   const start = (page - 1) * limit;
   const end = start + limit;
   const products = productsToProcess.slice(start, end);
@@ -60,15 +60,15 @@ export async function fetchProducts({
 }
 
 export async function fetchFeaturedProducts() {
-  let productsToProcess: Product[] = [...productsData];
+  let productsToProcess: Product[] = [...(productsData as unknown as Product[])];
 
   // Shuffle the array for random order
   for (let i = productsToProcess.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [productsToProcess[i], productsToProcess[j]] = [productsToProcess[j], productsToProcess[i]];
+    const j = Math.floor(Math.random() * (i + 1));
+    [productsToProcess[i], productsToProcess[j]] = [productsToProcess[j], productsToProcess[i]];
   }
 
   const products = productsToProcess.slice(0, 10);
-  
+
   return products;
 }
