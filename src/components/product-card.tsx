@@ -23,7 +23,6 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
   const { addToCart } = useCart();
   const { toast } = useToast();
   const [quickViewOpen, setQuickViewOpen] = useState(false);
-  const [isImageLoading, setIsImageLoading] = useState(true);
 
   if (!product) {
     return (
@@ -61,19 +60,14 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
       >
         <Link href={`/product/${productSlug}`} className="flex flex-col h-full" prefetch={true}>
           <div className="relative w-full overflow-hidden bg-gradient-to-b from-background to-muted/30 aspect-square">
-            {isImageLoading && <Skeleton className="absolute inset-0" />}
             <Image
               src={product.image.url}
               alt={product.image.alt}
               width={300}
               height={300}
               priority={priority}
-              className={cn(
-                "object-contain transition-transform duration-500 ease-out group-hover/card:scale-110 w-full h-full p-2",
-                isImageLoading ? 'opacity-0' : 'opacity-100'
-              )}
+              className="object-contain transition-transform duration-500 ease-out group-hover/card:scale-110 w-full h-full p-2"
               style={{ willChange: 'transform' }}
-              onLoad={() => setIsImageLoading(false)}
               loading={priority ? 'eager' : 'lazy'}
             />
             {/* Subtle gradient overlay on hover */}
