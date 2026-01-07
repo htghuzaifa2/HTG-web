@@ -42,8 +42,8 @@ export function ProductGridLoader({ category, sortBy, randomize = false, searchQ
         randomize,
       };
 
-      let productsToProcess: Product[] = [...productsData];
-      
+      let productsToProcess: Product[] = [...(productsData as unknown as Product[])];
+
       if (category) {
         productsToProcess = productsToProcess.filter(p => p.category.includes(category));
       }
@@ -64,7 +64,7 @@ export function ProductGridLoader({ category, sortBy, randomize = false, searchQ
         default:
           break;
       }
-      
+
       const totalProducts = productsToProcess.length;
       const start = (page - 1) * BATCH_SIZE;
       const end = start + BATCH_SIZE;
@@ -76,7 +76,7 @@ export function ProductGridLoader({ category, sortBy, randomize = false, searchQ
         const productMap = new Map(allProducts.map(p => [p.id, p]));
         return Array.from(productMap.values());
       });
-      
+
       setTotal(totalProducts);
       setHasMore(newProducts.length > 0 && (page * BATCH_SIZE) < totalProducts);
       setCurrentPage(page);
@@ -84,7 +84,7 @@ export function ProductGridLoader({ category, sortBy, randomize = false, searchQ
     },
     [category, sortBy, randomize]
   );
-  
+
   useEffect(() => {
     // This effect should not handle search query logic.
     // It's only for category/randomized grids.
@@ -101,7 +101,7 @@ export function ProductGridLoader({ category, sortBy, randomize = false, searchQ
       fetchAndSetProducts(currentPage + 1, true);
     }
   };
-  
+
   if (isLoading && products.length === 0) {
     return (
       <div>
@@ -111,28 +111,28 @@ export function ProductGridLoader({ category, sortBy, randomize = false, searchQ
   }
 
   if (products.length === 0 && !isLoading) {
-     return (
-       <div className="text-center py-16 text-muted-foreground">
-          {searchQuery ? "No products found matching your search." : "No products found in this category."}
-       </div>
-     )
+    return (
+      <div className="text-center py-16 text-muted-foreground">
+        {searchQuery ? "No products found matching your search." : "No products found in this category."}
+      </div>
+    )
   }
-  
+
   // Do not render if a search query is present, as search-client will handle it
-  if(searchQuery) {
+  if (searchQuery) {
     return null;
   }
 
   return (
     <div>
-       <div ref={gridRef} className="scroll-mt-20" />
+      <div ref={gridRef} className="scroll-mt-20" />
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-        {products.map((p, i) => <ProductCard key={`${p.id}-${i}`} product={p} priority={i < 10}/>)}
+        {products.map((p, i) => <ProductCard key={`${p.id}-${i}`} product={p} priority={i < 10} />)}
       </div>
 
-      {isLoading && products.length > 0 && 
+      {isLoading && products.length > 0 &&
         <div className="mt-8">
-            <ProductGridSkeleton/>
+          <ProductGridSkeleton />
         </div>
       }
 

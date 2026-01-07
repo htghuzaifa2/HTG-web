@@ -58,17 +58,17 @@ export function useWindowedProducts() {
   // For "Load Previous" sticky bar
   const [isLoadPreviousVisible, setIsLoadPreviousVisible] = useState(false);
   const lastScrollY = useRef(0);
-  
+
   // -- Initialization and State Restoration --
   useEffect(() => {
     // This effect runs only on the client
     const navigationEntries = performance.getEntriesByType("navigation") as PerformanceNavigationTiming[];
     if (navigationEntries.length > 0 && navigationEntries[0].type === 'reload') {
-        sessionStorage.removeItem('featuredScrollY');
-        sessionStorage.removeItem('featuredVisibleIds');
-        sessionStorage.removeItem('featuredShuffledOrder');
+      sessionStorage.removeItem('featuredScrollY');
+      sessionStorage.removeItem('featuredVisibleIds');
+      sessionStorage.removeItem('featuredShuffledOrder');
     }
-    
+
     const restoredScrollY = getSessionItem<number>('featuredScrollY');
     const restoredVisibleIds = getSessionItem<number[]>('featuredVisibleIds');
     const restoredShuffledOrder = getSessionItem<number[]>('featuredShuffledOrder');
@@ -77,14 +77,14 @@ export function useWindowedProducts() {
 
     if (restoredShuffledOrder && restoredVisibleIds && restoredVisibleIds.length > 0) {
       // Recreate the exact same shuffle
-      const productMap = new Map(productsData.map(p => [p.id, p]));
+      const productMap = new Map((productsData as unknown as Product[]).map(p => [p.id, p]));
       initialShuffle = restoredShuffledOrder.map(id => productMap.get(id)).filter(Boolean) as Product[];
       setShuffledProducts(initialShuffle);
 
       // Recreate the visible products
       const restoredProducts = restoredVisibleIds.map(id => productMap.get(id)).filter(Boolean) as Product[];
       setVisibleProducts(restoredProducts);
-      
+
       const firstVisibleId = restoredVisibleIds[0];
       const newStartIndex = initialShuffle.findIndex(p => p.id === firstVisibleId);
       setStartIndex(newStartIndex >= 0 ? newStartIndex : 0);
@@ -100,7 +100,7 @@ export function useWindowedProducts() {
 
     } else {
       // Standard fresh load
-      initialShuffle = shuffle([...productsData]);
+      initialShuffle = shuffle([...(productsData as unknown as Product[])]);
       setShuffledProducts(initialShuffle);
       const initialWindow = initialShuffle.slice(0, WINDOW_SIZE);
       setWindows([initialWindow, [], []]);
@@ -133,7 +133,7 @@ export function useWindowedProducts() {
     window.addEventListener('scroll', throttledScroll);
     return () => window.removeEventListener('scroll', throttledScroll);
   }, [visibleProducts, shuffledProducts]);
-  
+
 
   const canLoadMore = startIndex + visibleProducts.length < shuffledProducts.length;
   const canLoadPrevious = startIndex > 0;
@@ -150,21 +150,21 @@ export function useWindowedProducts() {
     //   fragment.appendChild(tempDiv.firstChild);
     // }
     // gridRef.current.appendChild(fragment);
-    
+
     // The React way is to update state and let React handle the DOM
     setVisibleProducts(prev => [...prev, ...productsToAppend]);
   };
-  
+
   const prependToGrid = (productsToPrepend: Product[]) => {
-     setVisibleProducts(prev => [...productsToPrepend, ...prev]);
+    setVisibleProducts(prev => [...productsToPrepend, ...prev]);
   };
 
   const removeFromGrid = (count: number, from: 'top' | 'bottom') => {
     if (!gridRef.current) return;
     if (from === 'top') {
-        setVisibleProducts(prev => prev.slice(count));
+      setVisibleProducts(prev => prev.slice(count));
     } else {
-        setVisibleProducts(prev => prev.slice(0, prev.length - count));
+      setVisibleProducts(prev => prev.slice(0, prev.length - count));
     }
   };
 
@@ -175,20 +175,20 @@ export function useWindowedProducts() {
     const currentVisibleCount = visibleProducts.length;
     const isWindowed = currentVisibleCount >= WINDOW_SIZE * 3;
 
-    if(isWindowed) {
+    if (isWindowed) {
       // Unload first window
       removeFromGrid(WINDOW_SIZE, 'top');
     }
-    
+
     const newStartIndex = isWindowed ? startIndex + WINDOW_SIZE : startIndex;
     const nextWindowStart = newStartIndex + currentVisibleCount;
     const productsToAppend = shuffledProducts.slice(nextWindowStart, nextWindowStart + WINDOW_SIZE);
-    
+
     appendToGrid(productsToAppend);
     setStartIndex(newStartIndex);
-    
+
     // Give react time to render before setting loading to false
-    setTimeout(() => setIsLoading(false), 100); 
+    setTimeout(() => setIsLoading(false), 100);
 
   }, [canLoadMore, isLoading, visibleProducts.length, shuffledProducts, startIndex]);
 
@@ -215,9 +215,9 @@ export function useWindowedProducts() {
 
     // Restore scroll position after DOM update
     requestAnimationFrame(() => {
-        const newHeight = gridRef.current?.scrollHeight || 0;
-        window.scrollBy(0, newHeight - prevHeight);
-        setIsLoading(false);
+      const newHeight = gridRef.current?.scrollHeight || 0;
+      window.scrollBy(0, newHeight - prevHeight);
+      setIsLoading(false);
     });
 
   }, [canLoadPrevious, isLoading, startIndex, shuffledProducts]);

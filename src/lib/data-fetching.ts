@@ -5,7 +5,7 @@ import type { Product } from "./types";
 export async function getProductData(slug: string) {
   await new Promise(resolve => setTimeout(resolve, 0)); // Simulate async fetch
 
-  const allProducts: Product[] = productsData;
+  const allProducts: Product[] = productsData as unknown as Product[];
   const product = allProducts.find((p) => p.slug === slug) || null;
 
   if (!product) {
@@ -13,8 +13,8 @@ export async function getProductData(slug: string) {
   }
 
   // 1. Get all products from the same category, excluding the current one.
-  const sameCategoryProducts = allProducts.filter(p => 
-    p.id !== product.id && 
+  const sameCategoryProducts = allProducts.filter(p =>
+    p.id !== product.id &&
     p.category.some(cat => product.category.includes(cat))
   );
 
@@ -27,12 +27,12 @@ export async function getProductData(slug: string) {
   if (relatedProducts.length < 10) {
     const needed = 10 - relatedProducts.length;
     const currentIds = new Set(relatedProducts.map(p => p.id).concat(product.id));
-    
+
     const randomProducts = allProducts
       .filter(p => !currentIds.has(p.id)) // Exclude already selected products and the main product
       .sort(() => 0.5 - Math.random()) // Shuffle
       .slice(0, needed);
-      
+
     relatedProducts = [...relatedProducts, ...randomProducts];
   }
 

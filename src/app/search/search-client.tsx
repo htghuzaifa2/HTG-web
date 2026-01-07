@@ -10,13 +10,13 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDebounce } from "@/hooks/use-debounce";
 
-const ALL_PRODUCTS: Product[] = [...productsData];
+const ALL_PRODUCTS: Product[] = [...(productsData as unknown as Product[])];
 const PAGE_SIZE = 25;
 
 export default function SearchClient() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
-  
+
   const [query, setQuery] = useState(initialQuery);
   const [displayedProducts, setDisplayedProducts] = useState<Product[]>([]);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -37,12 +37,12 @@ export default function SearchClient() {
     }
 
     const lowercasedQuery = trimmedQuery.toLowerCase();
-    
-    const startsWith = ALL_PRODUCTS.filter(p => 
+
+    const startsWith = ALL_PRODUCTS.filter(p =>
       p.name.toLowerCase().startsWith(lowercasedQuery)
     );
-    
-    const contains = ALL_PRODUCTS.filter(p => 
+
+    const contains = ALL_PRODUCTS.filter(p =>
       !p.name.toLowerCase().startsWith(lowercasedQuery) &&
       p.name.toLowerCase().includes(lowercasedQuery)
     );
@@ -69,7 +69,7 @@ export default function SearchClient() {
 
   const hasMore = visibleCount < filteredProducts.length;
 
-   useEffect(() => {
+  useEffect(() => {
     if (initialQuery !== query) {
       setQuery(initialQuery);
     }
@@ -81,7 +81,7 @@ export default function SearchClient() {
       <h1 className="mb-4 text-center font-headline text-4xl font-bold">
         Search Products
       </h1>
-      
+
       {initialQuery ? (
         <>
           <h3 className="mb-8 text-center text-lg text-muted-foreground">
@@ -112,7 +112,7 @@ export default function SearchClient() {
           )}
         </>
       ) : (
-         <p className="text-center text-muted-foreground">Please enter a search term to find products.</p>
+        <p className="text-center text-muted-foreground">Please enter a search term to find products.</p>
       )}
     </div>
   );

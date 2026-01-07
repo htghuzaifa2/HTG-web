@@ -57,7 +57,7 @@ function generateBingProductFeed(products: Product[]): string {
 }
 
 export async function GET() {
-  const products: Product[] = productsData;
+  const products: Product[] = productsData as unknown as Product[];
   const feed = generateBingProductFeed(products);
 
   return new Response(feed, {

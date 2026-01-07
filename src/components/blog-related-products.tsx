@@ -10,7 +10,7 @@ export default function BlogRelatedProducts() {
     const [products, setProducts] = useState<Product[]>([]);
 
     useEffect(() => {
-        const allProducts: Product[] = productsData;
+        const allProducts: Product[] = productsData as unknown as Product[];
         // Shuffle and pick 10 random products
         const shuffled = allProducts.sort(() => 0.5 - Math.random());
         const randomProducts = shuffled.slice(0, 10);
