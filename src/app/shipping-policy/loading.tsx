@@ -1,15 +1,6 @@
+import { Skeleton } from "@/components/ui/skeleton";
 
-"use client";
-
-import dynamic from 'next/dynamic';
-import { Skeleton } from '@/components/ui/skeleton';
-
-const ReturnPolicyClient = dynamic(() => import('./return-policy-client'), {
-  ssr: false,
-  loading: () => <ReturnPolicyPageSkeleton />,
-});
-
-function ReturnPolicyPageSkeleton() {
+export default function Loading() {
     return (
         <div className="container mx-auto px-4 py-12">
             <div className="max-w-4xl mx-auto">
@@ -27,8 +18,4 @@ function ReturnPolicyPageSkeleton() {
             </div>
         </div>
     );
-}
-
-export default function ReturnPolicyLoader() {
-    return <ReturnPolicyClient />;
 }

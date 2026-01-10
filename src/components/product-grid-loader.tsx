@@ -1,6 +1,8 @@
 
 'use client';
 
+import { useScrollPersistence } from '@/hooks/use-scroll-persistence';
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Product } from '@/lib/types';
 import { fetchProducts as serverFetchProducts } from '@/app/actions';
@@ -12,9 +14,11 @@ import productsData from '@/data/products.json';
 
 const BATCH_SIZE = 25;
 
+
+
 function ProductGridSkeleton() {
   return (
-    <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5">
+    <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5">
       {Array.from({ length: 10 }).map((_, i) => (
         <ProductCard key={`skeleton-${i}`} product={null} />
       ))}
@@ -29,6 +33,7 @@ export function ProductGridLoader({ category, sortBy, randomize = false, searchQ
   const [isLoading, setIsLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const gridRef = useRef<HTMLDivElement>(null);
+  const storageKey = `grid-${category || 'all'}-${sortBy || 'default'}-${randomize}`;
 
   const fetchAndSetProducts = useCallback(
     async (page: number, keepExisting = false) => {
@@ -85,16 +90,48 @@ export function ProductGridLoader({ category, sortBy, randomize = false, searchQ
     [category, sortBy, randomize]
   );
 
+  // Define the persisted state structure
+  type PersistedState = {
+    products: Product[];
+    currentPage: number;
+    hasMore: boolean;
+    total: number;
+  };
+
+  const { isRestoring, restoredData, saveState } = useScrollPersistence<PersistedState>(storageKey);
+
   useEffect(() => {
     // This effect should not handle search query logic.
-    // It's only for category/randomized grids.
     if (searchQuery) return;
 
-    setProducts([]);
-    setCurrentPage(1);
-    setHasMore(true);
-    fetchAndSetProducts(1, false);
-  }, [category, sortBy, randomize, searchQuery, fetchAndSetProducts]);
+    if (restoredData) {
+      setProducts(restoredData.products);
+      setCurrentPage(restoredData.currentPage);
+      setHasMore(restoredData.hasMore);
+      setTotal(restoredData.total);
+      setIsLoading(false);
+    } else if (!isRestoring) {
+      // Initial load only if not restoring
+      setProducts([]);
+      setCurrentPage(1);
+      setHasMore(true);
+      fetchAndSetProducts(1, false);
+    }
+  }, [category, sortBy, randomize, searchQuery, fetchAndSetProducts, isRestoring, restoredData]);
+
+  // Save state
+  useEffect(() => {
+    if (searchQuery) return; // Don't persist search results here
+
+    if (products.length > 0) {
+      saveState({
+        products,
+        currentPage,
+        hasMore,
+        total
+      });
+    }
+  }, [products, currentPage, hasMore, total, saveState, searchQuery]);
 
   const loadMoreProducts = () => {
     if (hasMore && !isLoading) {
@@ -126,7 +163,7 @@ export function ProductGridLoader({ category, sortBy, randomize = false, searchQ
   return (
     <div>
       <div ref={gridRef} className="scroll-mt-20" />
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {products.map((p, i) => <ProductCard key={`${p.id}-${i}`} product={p} priority={i < 10} />)}
       </div>
 

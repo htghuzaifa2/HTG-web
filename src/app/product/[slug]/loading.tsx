@@ -1,15 +1,6 @@
-
-"use client";
-
-import dynamic from 'next/dynamic';
 import { Skeleton } from "@/components/ui/skeleton";
 
-const ProductDetailsClient = dynamic(() => import('./product-details-client'), {
-  ssr: false,
-  loading: () => <ProductDetailsSkeleton />,
-});
-
-function ProductDetailsSkeleton() {
+export default function Loading() {
     return (
         <div className="container mx-auto px-4 py-8 md:py-12">
             <div className="mb-6">
@@ -44,12 +35,4 @@ function ProductDetailsSkeleton() {
             </div>
         </div>
     );
-}
-
-interface ProductDetailsLoaderProps {
-    slug: string;
-}
-
-export default function ProductDetailsLoader({ slug }: ProductDetailsLoaderProps) {
-    return <ProductDetailsClient slug={slug} />;
 }

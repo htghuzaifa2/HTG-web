@@ -7,8 +7,10 @@ import Footer from '@/components/footer';
 import { Toaster } from "@/components/ui/toaster"
 import { CartProvider } from '@/context/cart-context';
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { Belleza, Alegreya } from 'next/font/google';
 import { ScrollToTop } from '@/components/scroll-to-top';
+import { ScrollManager } from '@/components/scroll-manager';
 import { WhatsappIcon } from '@/components/whatsapp-icon';
 import { SearchProvider } from '@/context/search-context';
 import SearchBar from '@/components/search-bar';
@@ -115,12 +117,17 @@ export default function RootLayout({
               <LightboxProvider>
                 <div className="flex min-h-screen flex-col">
                   <Header />
-                  <SearchBar />
+                  <Suspense fallback={<div className="h-0" />}>
+                    <SearchBar />
+                  </Suspense>
                   <main className="flex-1">{children}</main>
                   <Footer />
                 </div>
                 <Toaster />
                 <ScrollToTop />
+                <Suspense fallback={null}>
+                  <ScrollManager />
+                </Suspense>
                 <Link
                   href="https://wa.me/message/BY3URMYOW3OMH1"
                   target="_blank"

@@ -1,5 +1,7 @@
 import { Metadata } from 'next';
-import CashOnDeliveryLoader from './cash-on-delivery-loader';
+import CashOnDeliveryClient from './cash-on-delivery-client';
+import { Suspense } from 'react';
+import Loading from './loading';
 
 export const metadata: Metadata = {
     title: "Cash on Delivery (COD) - How It Works | HTG",
@@ -12,5 +14,9 @@ export const metadata: Metadata = {
 };
 
 export default function CashOnDeliveryPage() {
-    return <CashOnDeliveryLoader />;
+    return (
+        <Suspense fallback={<Loading />}>
+            <CashOnDeliveryClient />
+        </Suspense>
+    );
 }

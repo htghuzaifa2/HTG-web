@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
-import CategoriesLoader from './categories-loader';
+import CategoriesClient from './categories-client';
+import { Suspense } from 'react';
+import Loading from './loading';
 
 export const metadata: Metadata = {
   title: 'Product Categories - Fashion, Tech & More',
@@ -12,5 +14,9 @@ export const metadata: Metadata = {
 };
 
 export default function CategoriesPage() {
-  return <CategoriesLoader />;
+  return (
+    <Suspense fallback={<Loading />}>
+      <CategoriesClient />
+    </Suspense>
+  );
 }

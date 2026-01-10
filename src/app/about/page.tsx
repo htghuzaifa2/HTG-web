@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import AboutLoader from './about-loader';
+import AboutClient from './about-client';
 
 export const metadata: Metadata = {
     title: "About HTG - Premium Fashion Brand Story",
@@ -12,5 +12,5 @@ export const metadata: Metadata = {
 };
 
 export default function AboutPage() {
-    return <AboutLoader />;
+    return <AboutClient />;
 }

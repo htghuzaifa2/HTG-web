@@ -1,5 +1,7 @@
 import { Metadata } from 'next';
-import ShippingPolicyLoader from './shipping-policy-loader';
+import ShippingPolicyClient from './shipping-policy-client';
+import { Suspense } from 'react';
+import Loading from './loading';
 
 export const metadata: Metadata = {
     title: "Shipping Policy - Pakistan-Wide Delivery | HTG",
@@ -12,5 +14,9 @@ export const metadata: Metadata = {
 };
 
 export default function ShippingPolicyPage() {
-    return <ShippingPolicyLoader />;
+    return (
+        <Suspense fallback={<Loading />}>
+            <ShippingPolicyClient />
+        </Suspense>
+    );
 }

@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import ContactLoader from "./contact-loader";
+import ContactClient from "./contact-client";
 
 export const metadata: Metadata = {
     title: "Contact HTG - WhatsApp & Customer Support",
@@ -12,5 +12,5 @@ export const metadata: Metadata = {
 };
 
 export default function ContactPage() {
-    return <ContactLoader />;
+    return <ContactClient />;
 }

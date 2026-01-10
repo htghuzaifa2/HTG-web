@@ -1,5 +1,7 @@
-import CheckoutLoader from "./checkout-loader";
+import CheckoutClient from "./checkout-client";
 import { Metadata } from 'next';
+import { Suspense } from 'react';
+import Loading from './loading';
 
 export const metadata: Metadata = {
   title: "Checkout | HTG - Secure Payment",
@@ -12,5 +14,9 @@ export const metadata: Metadata = {
 };
 
 export default function CheckoutPage() {
-  return <CheckoutLoader />;
+  return (
+    <Suspense fallback={<Loading />}>
+      <CheckoutClient />
+    </Suspense>
+  );
 }

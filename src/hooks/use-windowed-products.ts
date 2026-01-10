@@ -5,6 +5,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import type { Product } from '@/lib/types';
 import productsData from '@/data/products.json';
 import { useDebounce } from './use-debounce';
+import { useScrollPersistence } from './use-scroll-persistence';
 
 const WINDOW_SIZE = 25;
 
@@ -48,7 +49,7 @@ export function useWindowedProducts() {
   const [visibleProducts, setVisibleProducts] = useState<Product[]>([]);
   const [startIndex, setStartIndex] = useState(0); // The start index of the very first visible window
   const [isLoading, setIsLoading] = useState(true);
-  const [isRestoring, setIsRestoring] = useState(true);
+
   const gridRef = useRef<HTMLDivElement>(null);
 
   // Debounce for load more clicks
@@ -59,58 +60,53 @@ export function useWindowedProducts() {
   const [isLoadPreviousVisible, setIsLoadPreviousVisible] = useState(false);
   const lastScrollY = useRef(0);
 
+  // Use the new persistence hook
+  // We store the shuffled order and the list of visible IDs
+  type PersistedState = {
+    shuffledOrder: number[];
+    visibleIds: number[];
+  };
+
+  const { isRestoring, wasRestored, restoredData, saveState } = useScrollPersistence<PersistedState>('windowed_products');
+
+  // Derived state
+  const canLoadMore = startIndex + visibleProducts.length < shuffledProducts.length;
+  const canLoadPrevious = startIndex > 0;
+
   // -- Initialization and State Restoration --
   useEffect(() => {
-    // This effect runs only on the client
-    const navigationEntries = performance.getEntriesByType("navigation") as PerformanceNavigationTiming[];
-    if (navigationEntries.length > 0 && navigationEntries[0].type === 'reload') {
-      sessionStorage.removeItem('featuredScrollY');
-      sessionStorage.removeItem('featuredVisibleIds');
-      sessionStorage.removeItem('featuredShuffledOrder');
-    }
-
-    const restoredScrollY = getSessionItem<number>('featuredScrollY');
-    const restoredVisibleIds = getSessionItem<number[]>('featuredVisibleIds');
-    const restoredShuffledOrder = getSessionItem<number[]>('featuredShuffledOrder');
-
     let initialShuffle: Product[];
 
-    if (restoredShuffledOrder && restoredVisibleIds && restoredVisibleIds.length > 0) {
+    if (wasRestored && restoredData) {
       // Recreate the exact same shuffle
       const productMap = new Map((productsData as unknown as Product[]).map(p => [p.id, p]));
-      initialShuffle = restoredShuffledOrder.map(id => productMap.get(id)).filter(Boolean) as Product[];
+      initialShuffle = restoredData.shuffledOrder.map((id: number) => productMap.get(id)).filter(Boolean) as Product[];
       setShuffledProducts(initialShuffle);
 
       // Recreate the visible products
-      const restoredProducts = restoredVisibleIds.map(id => productMap.get(id)).filter(Boolean) as Product[];
+      const restoredProducts = restoredData.visibleIds.map((id: number) => productMap.get(id)).filter(Boolean) as Product[];
       setVisibleProducts(restoredProducts);
 
-      const firstVisibleId = restoredVisibleIds[0];
+      const firstVisibleId = restoredData.visibleIds[0];
       const newStartIndex = initialShuffle.findIndex(p => p.id === firstVisibleId);
       setStartIndex(newStartIndex >= 0 ? newStartIndex : 0);
 
-      // Scroll to position after layout
-      setTimeout(() => {
-        if (restoredScrollY) {
-          window.scrollTo({ top: restoredScrollY, behavior: 'instant' });
-        }
-        setIsRestoring(false);
-        setIsLoading(false);
-      }, 0);
+      // Loading state is handled by the hook's isRestoring, but we sync our local loading state
+      setIsLoading(false);
 
-    } else {
-      // Standard fresh load
+    } else if (!isRestoring) {
+      // Standard fresh load (only if not currently trying to restore)
       initialShuffle = shuffle([...(productsData as unknown as Product[])]);
       setShuffledProducts(initialShuffle);
       const initialWindow = initialShuffle.slice(0, WINDOW_SIZE);
       setWindows([initialWindow, [], []]);
       setVisibleProducts(initialWindow);
-      setIsRestoring(false);
       setIsLoading(false);
     }
-  }, []);
+  }, [isRestoring, wasRestored, restoredData]);
 
-  // -- Scroll Position Saving --
+
+  // -- Scroll Position & State Saving --
   useEffect(() => {
     const handleScroll = () => {
       // For "Load Previous" bar visibility
@@ -121,22 +117,23 @@ export function useWindowedProducts() {
         }
         lastScrollY.current = currentScrollY;
       }
-      // For saving position
+
+      // For saving position via our hook
       const visibleIds = visibleProducts.map(p => p.id);
-      if (visibleIds.length > 0) {
-        setSessionItem('featuredScrollY', window.scrollY);
-        setSessionItem('featuredVisibleIds', visibleIds);
-        setSessionItem('featuredShuffledOrder', shuffledProducts.map(p => p.id));
+      if (visibleIds.length > 0 && shuffledProducts.length > 0) {
+        saveState({
+          shuffledOrder: shuffledProducts.map(p => p.id),
+          visibleIds: visibleIds
+        });
       }
     };
+
     const throttledScroll = () => requestAnimationFrame(handleScroll);
     window.addEventListener('scroll', throttledScroll);
     return () => window.removeEventListener('scroll', throttledScroll);
-  }, [visibleProducts, shuffledProducts]);
+  }, [visibleProducts, shuffledProducts, canLoadPrevious, saveState]);
 
 
-  const canLoadMore = startIndex + visibleProducts.length < shuffledProducts.length;
-  const canLoadPrevious = startIndex > 0;
 
   const appendToGrid = (productsToAppend: Product[]) => {
     if (!gridRef.current) return;
@@ -232,6 +229,7 @@ export function useWindowedProducts() {
     canLoadPrevious,
     gridRef,
     isLoadPreviousVisible,
-    setIsLoadPreviousVisible
+    setIsLoadPreviousVisible,
+    wasRestored
   };
 }

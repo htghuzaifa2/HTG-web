@@ -1,5 +1,7 @@
 import { Metadata } from 'next';
-import ReturnPolicyLoader from './return-policy-loader';
+import ReturnPolicyClient from './return-policy-client';
+import { Suspense } from 'react';
+import Loading from './loading';
 
 export const metadata: Metadata = {
     title: "Return & Refund Policy | HTG",
@@ -12,5 +14,9 @@ export const metadata: Metadata = {
 };
 
 export default function ReturnPolicyPage() {
-    return <ReturnPolicyLoader />;
+    return (
+        <Suspense fallback={<Loading />}>
+            <ReturnPolicyClient />
+        </Suspense>
+    );
 }

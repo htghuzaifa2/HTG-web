@@ -33,6 +33,7 @@ export default function Footer() {
               <li><Link href="/how-to-pay" className="text-muted-foreground hover:text-primary transition-colors" prefetch={true}>How to Pay</Link></li>
               <li><Link href="/cash-on-delivery" className="text-muted-foreground hover:text-primary transition-colors" prefetch={true}>COD</Link></li>
               <li><Link href="/faq" className="text-muted-foreground hover:text-primary transition-colors" prefetch={true}>FAQ</Link></li>
+              <li><Link href="/games-copyright" className="text-muted-foreground hover:text-primary transition-colors" prefetch={true}>Games Copyright</Link></li>
             </ul>
           </div>
           <div>

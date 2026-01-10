@@ -1,16 +1,7 @@
-
-"use client";
-
-import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
 import ProductCard from '@/components/product-card';
 
-const HomeClient = dynamic(() => import('./home-client'), {
-  ssr: false,
-  loading: () => <HomePageSkeleton />,
-});
-
-function HomePageSkeleton() {
+export default function Loading() {
   return (
     <div>
         <section className="w-full py-20 md:py-24 lg:py-32 bg-muted/50">
@@ -39,8 +30,4 @@ function HomePageSkeleton() {
         </section>
     </div>
   );
-}
-
-export default function HomeLoader() {
-    return <HomeClient />;
 }

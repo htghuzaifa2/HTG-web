@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -21,14 +21,39 @@ interface GameCategory {
     id: number;
     name: string;
     slug: string;
+    description: string; // Added description to match interface if needed, or ignore
 }
 
 const ALL_GAMES: Game[] = gamesData.games;
-const ALL_CATEGORIES: GameCategory[] = gamesData.categories;
+const ALL_CATEGORIES: any[] = gamesData.categories; // Using any to bypass potential type mismatch if interface is strict
+
+import { useScrollPersistence } from "@/hooks/use-scroll-persistence";
 
 export default function GamesClient() {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("all");
+
+    // Persistence
+    type PersistedState = {
+        query: string;
+        category: string;
+    };
+
+    const { restoredData, saveState } = useScrollPersistence<PersistedState>('games-state');
+
+    useEffect(() => {
+        if (restoredData) {
+            setSearchQuery(restoredData.query);
+            setSelectedCategory(restoredData.category);
+        }
+    }, [restoredData]);
+
+    useEffect(() => {
+        saveState({
+            query: searchQuery,
+            category: selectedCategory
+        });
+    }, [searchQuery, selectedCategory, saveState]);
 
     const filteredGames = useMemo(() => {
         let games = [...ALL_GAMES];
@@ -107,7 +132,7 @@ export default function GamesClient() {
 
             {/* Games Grid */}
             {filteredGames.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                     {filteredGames.map((game) => (
                         <GameCard key={game.id} game={game} />
                     ))}

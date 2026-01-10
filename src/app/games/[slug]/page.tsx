@@ -3,6 +3,8 @@ import GameEmbedClient from "./game-embed-client";
 import gamesData from "@/data/games.json";
 import Script from "next/script";
 import { notFound } from "next/navigation";
+import { Suspense } from 'react';
+import Loading from './loading';
 
 type PageProps = {
     params: { slug: string };
@@ -92,7 +94,9 @@ export default function GamePage({ params }: PageProps) {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
             />
-            <GameEmbedClient game={game} />
+            <Suspense fallback={<Loading />}>
+                <GameEmbedClient game={game} />
+            </Suspense>
         </>
     );
 }

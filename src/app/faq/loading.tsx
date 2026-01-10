@@ -1,15 +1,6 @@
+import { Skeleton } from "@/components/ui/skeleton";
 
-"use client";
-
-import dynamic from 'next/dynamic';
-import { Skeleton } from '@/components/ui/skeleton';
-
-const FaqClient = dynamic(() => import('./faq-client'), {
-  ssr: false,
-  loading: () => <FaqPageSkeleton />,
-});
-
-function FaqPageSkeleton() {
+export default function Loading() {
     return (
         <div className="container mx-auto px-4 py-12">
             <div className="max-w-3xl mx-auto">
@@ -23,8 +14,4 @@ function FaqPageSkeleton() {
             </div>
         </div>
     );
-}
-
-export default function FaqLoader() {
-    return <FaqClient />;
 }

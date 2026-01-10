@@ -1,15 +1,6 @@
+import { Skeleton } from "@/components/ui/skeleton";
 
-"use client";
-
-import dynamic from 'next/dynamic';
-import { Skeleton } from '@/components/ui/skeleton';
-
-const AboutClient = dynamic(() => import('./about-client'), {
-  ssr: false,
-  loading: () => <AboutPageSkeleton />,
-});
-
-function AboutPageSkeleton() {
+export default function Loading() {
     return (
         <div className="container mx-auto px-4 py-16 md:py-24 space-y-24">
             <header className="relative flex items-center justify-center h-[60vh] md:h-[70vh]">
@@ -47,8 +38,4 @@ function AboutPageSkeleton() {
             </section>
         </div>
     );
-}
-
-export default function AboutLoader() {
-    return <AboutClient />;
 }

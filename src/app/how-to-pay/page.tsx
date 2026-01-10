@@ -1,5 +1,7 @@
 import { Metadata } from 'next';
-import HowToPayLoader from './how-to-pay-loader';
+import HowToPayClient from './how-to-pay-client';
+import { Suspense } from 'react';
+import Loading from './loading';
 
 export const metadata: Metadata = {
     title: "How to Pay - Payment Methods | HTG",
@@ -12,5 +14,9 @@ export const metadata: Metadata = {
 };
 
 export default function HowToPayPage() {
-    return <HowToPayLoader />;
+    return (
+        <Suspense fallback={<Loading />}>
+            <HowToPayClient />
+        </Suspense>
+    );
 }

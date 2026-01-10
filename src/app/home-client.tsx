@@ -46,13 +46,20 @@ export default function HomeClient() {
                     <p className="hero-text font-body mt-6 max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground">
                         Welcome to HTG—where Sialkot's finest meets global fashion HTG – Style Without Borders.
                     </p>
-                    <div className="hero-buttons mt-8 flex flex-wrap justify-center gap-4">
-                        <Button asChild size="lg" className="transition-transform hover:scale-105 duration-300">
-                            <Link href="/all-products" prefetch={true}>Shop Now</Link>
-                        </Button>
-                        <Button asChild size="lg" variant="outline" className="transition-transform hover:scale-105 duration-300">
-                            <Link href="/categories" prefetch={true}>Browse Categories</Link>
-                        </Button>
+                    <div className="hero-buttons mt-8 flex flex-col items-center gap-4">
+                        <div className="flex flex-wrap justify-center gap-4">
+                            <Button asChild size="lg" className="transition-transform hover:scale-105 duration-300">
+                                <Link href="/all-products" prefetch={true}>Shop Now</Link>
+                            </Button>
+                            <Button asChild size="lg" variant="outline" className="transition-transform hover:scale-105 duration-300">
+                                <Link href="/categories" prefetch={true}>Browse Categories</Link>
+                            </Button>
+                        </div>
+                        <div className="mt-2 animate-in fade-in slide-in-from-bottom-3 duration-1000 delay-200">
+                            <p className="text-sm font-medium text-muted-foreground">
+                                Custom size available for free - <Link href="/custom-size" className="text-primary underline underline-offset-4 hover:text-primary/80 transition-colors">See Here</Link>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </section>

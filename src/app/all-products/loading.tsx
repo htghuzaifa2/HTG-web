@@ -1,18 +1,9 @@
-
-"use client";
-
-import dynamic from 'next/dynamic';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from "@/components/ui/skeleton";
 import ProductCard from '@/components/product-card';
 
-const AllProductsClient = dynamic(() => import('./all-products-client'), {
-  ssr: false,
-  loading: () => <AllProductsSkeleton />,
-});
-
-function AllProductsSkeleton() {
+export default function Loading() {
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="container mx-auto px-4 py-12 md:py-16">
       <Skeleton className="h-10 w-1/2 mx-auto mb-2" />
       <Skeleton className="h-6 w-3/4 mx-auto mb-8" />
       <div className="mb-8 space-y-4">
@@ -32,9 +23,3 @@ function AllProductsSkeleton() {
     </div>
   );
 }
-
-export default function AllProductsLoader() {
-    return <AllProductsClient />;
-}
-
-    

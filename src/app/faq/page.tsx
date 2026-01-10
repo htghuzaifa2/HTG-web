@@ -1,5 +1,7 @@
 import { Metadata } from 'next';
-import FaqLoader from './faq-loader';
+import FaqClient from './faq-client';
+import { Suspense } from 'react';
+import Loading from './loading';
 
 export const metadata: Metadata = {
     title: "FAQ - Frequently Asked Questions | HTG",
@@ -12,5 +14,9 @@ export const metadata: Metadata = {
 };
 
 export default function FaqPage() {
-    return <FaqLoader />;
+    return (
+        <Suspense fallback={<Loading />}>
+            <FaqClient />
+        </Suspense>
+    );
 }

@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
-import TermsAndConditionsLoader from './terms-and-conditions-loader';
+import TermsAndConditionsClient from './terms-and-conditions-client';
+import { Suspense } from 'react';
+import Loading from './loading';
 
 export const metadata: Metadata = {
     title: "Terms & Conditions - HTG",
@@ -12,5 +14,9 @@ export const metadata: Metadata = {
 };
 
 export default function TermsAndConditionsPage() {
-    return <TermsAndConditionsLoader />;
+    return (
+        <Suspense fallback={<Loading />}>
+            <TermsAndConditionsClient />
+        </Suspense>
+    );
 }

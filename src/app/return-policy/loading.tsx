@@ -1,15 +1,6 @@
+import { Skeleton } from "@/components/ui/skeleton";
 
-"use client";
-
-import dynamic from 'next/dynamic';
-import { Skeleton } from '@/components/ui/skeleton';
-
-const ShippingPolicyClient = dynamic(() => import('./shipping-policy-client'), {
-  ssr: false,
-  loading: () => <ShippingPolicyPageSkeleton />,
-});
-
-function ShippingPolicyPageSkeleton() {
+export default function Loading() {
     return (
         <div className="container mx-auto px-4 py-12">
             <div className="max-w-4xl mx-auto">
@@ -27,8 +18,4 @@ function ShippingPolicyPageSkeleton() {
             </div>
         </div>
     );
-}
-
-export default function ShippingPolicyLoader() {
-    return <ShippingPolicyClient />;
 }

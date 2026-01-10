@@ -12,6 +12,7 @@ import { useDebounce } from "@/hooks/use-debounce";
 
 const ALL_PRODUCTS: Product[] = [...(productsData as unknown as Product[])];
 const PAGE_SIZE = 25;
+import { useScrollPersistence } from "@/hooks/use-scroll-persistence";
 
 export default function SearchClient() {
   const searchParams = useSearchParams();
@@ -50,12 +51,27 @@ export default function SearchClient() {
     return [...startsWith, ...contains];
   }, [debouncedQuery]);
 
+  const { restoredData, saveState, isRestoring } = useScrollPersistence<{ visibleCount: number }>('search-client');
+
   useEffect(() => {
-    setIsLoading(true);
-    setVisibleCount(PAGE_SIZE);
-    setDisplayedProducts(filteredProducts.slice(0, PAGE_SIZE));
-    setIsLoading(false);
-  }, [filteredProducts]);
+    if (restoredData) {
+      setVisibleCount(restoredData.visibleCount);
+      setDisplayedProducts(filteredProducts.slice(0, restoredData.visibleCount));
+      setIsLoading(false);
+    } else if (!isRestoring) {
+      setIsLoading(true);
+      setVisibleCount(PAGE_SIZE);
+      setDisplayedProducts(filteredProducts.slice(0, PAGE_SIZE));
+      setIsLoading(false);
+    }
+  }, [filteredProducts, restoredData, isRestoring]);
+
+  // Save state
+  useEffect(() => {
+    if (displayedProducts.length > 0) {
+      saveState({ visibleCount });
+    }
+  }, [displayedProducts, visibleCount, saveState]);
 
   const loadMore = useCallback(() => {
     const newVisibleCount = visibleCount + PAGE_SIZE;

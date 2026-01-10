@@ -11,10 +11,11 @@ import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useScrollPersistence } from '@/hooks/use-scroll-persistence';
 
 const ALL_PRODUCTS: Product[] = [...(productsData as unknown as Product[])];
 const ALL_CATEGORIES: Category[] = [{ id: 0, name: "All", slug: "all", image: "" }, ...categoriesData.categories];
@@ -65,6 +66,21 @@ export default function AllProductsClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const topOfProductsRef = useRef<HTMLDivElement>(null);
+
+  // Use scroll persistence hook to handle scroll restoration with 15-min expiry
+  // We don't need to persist data here as URL params handle the state (page, sort, category)
+  // This hook ensures that if the user comes back within 15 mins, they scroll to where they were.
+  const { saveState } = useScrollPersistence<null>('all_products');
+
+  // Save scroll position
+  useEffect(() => {
+    const handleScroll = () => {
+      saveState(null);
+    };
+    const throttledScroll = () => requestAnimationFrame(handleScroll);
+    window.addEventListener('scroll', throttledScroll);
+    return () => window.removeEventListener('scroll', throttledScroll);
+  }, [saveState]);
 
   const pageParam = searchParams.get('page') || '1';
   const sortParam = searchParams.get('sort') || 'newest';
@@ -183,7 +199,7 @@ export default function AllProductsClient() {
 
       {paginatedProducts.length > 0 ? (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {paginatedProducts.map((product) => (
               <ProductCard key={`paginated-${product.id}`} product={product} />
             ))}

@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
-import SearchLoader from './search-loader';
+import SearchClient from './search-client';
+import { Suspense } from 'react';
+import Loading from './loading';
 
 export const metadata: Metadata = {
   title: "Search Products",
@@ -12,5 +14,9 @@ export const metadata: Metadata = {
 };
 
 export default function SearchPage() {
-  return <SearchLoader />;
+  return (
+    <Suspense fallback={<Loading />}>
+      <SearchClient />
+    </Suspense>
+  );
 }

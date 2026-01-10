@@ -1,6 +1,10 @@
 import type { Metadata } from 'next';
-import CategoryLoader from './category-loader';
+import CategoryClient from './category-client';
 import categoriesData from '@/data/categories.json';
+import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
+import Loading from './loading';
+import type { Category } from '@/lib/types';
 
 type PageProps = {
   params: { slug: string };
@@ -42,5 +46,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default function CategoryPage({ params }: PageProps) {
-  return <CategoryLoader slug={params.slug} />;
+  const category = categoriesData.categories.find(c => c.slug === params.slug) as Category;
+
+  if (!category) {
+    notFound();
+  }
+
+  return (
+    <Suspense fallback={<Loading />}>
+      <CategoryClient category={category} />
+    </Suspense>
+  );
 }

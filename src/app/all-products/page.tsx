@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
-import AllProductsLoader from './all-products-loader';
+import AllProductsClient from './all-products-client';
+import { Suspense } from 'react';
+import Loading from './loading';
 
 export const metadata: Metadata = {
     title: "All Products | HTG - Premium Clothing Store",
@@ -12,5 +14,9 @@ export const metadata: Metadata = {
 };
 
 export default function AllProductsPage() {
-    return <AllProductsLoader />;
+    return (
+        <Suspense fallback={<Loading />}>
+            <AllProductsClient />
+        </Suspense>
+    );
 }

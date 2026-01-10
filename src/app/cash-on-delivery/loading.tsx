@@ -1,15 +1,6 @@
+import { Skeleton } from "@/components/ui/skeleton";
 
-"use client";
-
-import dynamic from 'next/dynamic';
-import { Skeleton } from '@/components/ui/skeleton';
-
-const CashOnDeliveryClient = dynamic(() => import('./cash-on-delivery-client'), {
-  ssr: false,
-  loading: () => <CashOnDeliveryPageSkeleton />,
-});
-
-function CashOnDeliveryPageSkeleton() {
+export default function Loading() {
     return (
         <div className="container mx-auto px-4 py-12">
             <div className="max-w-4xl mx-auto">
@@ -23,8 +14,4 @@ function CashOnDeliveryPageSkeleton() {
             </div>
         </div>
     );
-}
-
-export default function CashOnDeliveryLoader() {
-    return <CashOnDeliveryClient />;
 }

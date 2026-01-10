@@ -1,5 +1,7 @@
 
-import HomeLoader from './home-loader';
+import HomeClient from './home-client';
+import { Suspense } from 'react';
+import Loading from './loading';
 import type { Metadata } from 'next';
 import productsData from '@/data/products.json';
 import Script from 'next/script';
@@ -56,7 +58,9 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <HomeLoader />
+      <Suspense fallback={<Loading />}>
+        <HomeClient />
+      </Suspense>
     </>
   );
 }

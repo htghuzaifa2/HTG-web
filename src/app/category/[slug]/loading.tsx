@@ -1,18 +1,7 @@
-
-"use client";
-
-import dynamic from 'next/dynamic';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from "@/components/ui/skeleton";
 import ProductCard from '@/components/product-card';
 
-// Dynamically import the client component with SSR disabled
-const CategoryClient = dynamic(() => import('./category-client'), {
-  ssr: false,
-  loading: () => <CategoryPageSkeleton />,
-});
-
-// Define the skeleton loader component
-function CategoryPageSkeleton() {
+export default function Loading() {
   return (
     <div className="container mx-auto px-4 py-12">
       <Skeleton className="h-10 w-1/2 mx-auto mb-2" />
@@ -27,13 +16,4 @@ function CategoryPageSkeleton() {
       </div>
     </div>
   );
-}
-
-interface CategoryLoaderProps {
-  slug: string;
-}
-
-// The loader component that will be rendered on the server
-export default function CategoryLoader({ slug }: CategoryLoaderProps) {
-    return <CategoryClient slug={slug} />;
 }

@@ -1,16 +1,7 @@
-
-"use client";
-
-import dynamic from 'next/dynamic';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from "@/components/ui/skeleton";
 import ProductCard from '@/components/product-card';
 
-const SearchClient = dynamic(() => import('./search-client'), {
-  ssr: false,
-  loading: () => <SearchSkeleton />,
-});
-
-function SearchSkeleton() {
+export default function Loading() {
   return (
     <div className="container mx-auto px-4 py-12">
       <Skeleton className="h-10 w-1/2 mx-auto mb-4" />
@@ -24,9 +15,5 @@ function SearchSkeleton() {
         ))}
       </div>
     </div>
-  )
-}
-
-export default function SearchLoader() {
-  return <SearchClient />;
+  );
 }

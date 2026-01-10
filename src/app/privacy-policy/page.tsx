@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
-import PrivacyPolicyLoader from './privacy-policy-loader';
+import PrivacyPolicyClient from './privacy-policy-client';
+import { Suspense } from 'react';
+import Loading from './loading';
 
 export const metadata: Metadata = {
     title: "Privacy Policy - HTG",
@@ -12,5 +14,9 @@ export const metadata: Metadata = {
 };
 
 export default function PrivacyPolicyPage() {
-    return <PrivacyPolicyLoader />;
+    return (
+        <Suspense fallback={<Loading />}>
+            <PrivacyPolicyClient />
+        </Suspense>
+    );
 }

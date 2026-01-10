@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useRef, useEffect, useState } from 'react';
@@ -31,6 +30,7 @@ export default function FeaturedProducts() {
     isLoadPreviousVisible,
     setIsLoadPreviousVisible,
     isRestoring,
+    wasRestored,
   } = useWindowedProducts();
 
   const loadPreviousBarRef = useRef<HTMLDivElement>(null);
@@ -58,52 +58,64 @@ export default function FeaturedProducts() {
     };
   }, [canLoadPrevious]);
 
+  // Track if we've done the initial animation
+  const hasInitiallyAnimated = useRef(false);
+
   // Stagger animation for product cards
   useEffect(() => {
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry, index) => {
-          if (entry.isIntersecting) {
-            setTimeout(() => {
-              entry.target.classList.add('product-card-visible');
-            }, index * 50); // Stagger by 50ms
-          }
+    // If we're restoring from navigation (products exist but we haven't animated yet),
+    // make all cards visible immediately without animation
+    if (isRestoring) {
+      return;
+    }
+
+    // Check if we've already shown the animation in this session
+    const sessionAnimationShown = typeof window !== 'undefined' && sessionStorage.getItem('featured-products-animation-shown');
+
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      const cards = document.querySelectorAll('.product-card-animate:not(.product-card-visible)');
+
+      // If this is a restoration (coming back from product page) or animation already shown in session, make cards visible immediately
+      if (wasRestored || hasInitiallyAnimated.current || sessionAnimationShown) {
+        cards.forEach((card) => {
+          card.classList.add('product-card-visible');
         });
-      },
-      { threshold: 0.1, rootMargin: '50px' }
-    );
+        return;
+      }
 
-    const cards = document.querySelectorAll('.product-card-animate');
-    cards.forEach((card) => observerRef.current?.observe(card));
+      // First time loading - use staggered animation
+      hasInitiallyAnimated.current = true;
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('featured-products-animation-shown', 'true');
+      }
 
-    return () => observerRef.current?.disconnect();
-  }, [products]);
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+              // Add visible class and stop observing this element
+              setTimeout(() => {
+                entry.target.classList.add('product-card-visible');
+              }, index * 50); // Stagger by 50ms
+              observerRef.current?.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.1, rootMargin: '100px' }
+      );
 
-  if (isRestoring) {
-    return (
-      <section className="py-16 md:py-24">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="font-headline text-4xl font-bold">Featured Products</h2>
-            <p className="mt-4 text-lg text-muted-foreground">Hand-picked just for you.</p>
-          </div>
-          <div
-            id="featured-grid-container"
-            className="relative"
-          >
-            <div ref={gridRef} id="featured-grid" className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-              {products.map((p) => (
-                <ProductCard key={p.id} product={p} priority={true} />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-    )
-  }
+      cards.forEach((card) => observerRef.current?.observe(card));
+    }, 100);
+
+    return () => {
+      clearTimeout(timer);
+      observerRef.current?.disconnect();
+    };
+  }, [products, isRestoring, wasRestored]);
 
   return (
-    <section className="py-16 md:py-24">
+    <section className="py-12 md:py-24">
       <style jsx>{`
         .product-card-animate {
           opacity: 0;
@@ -129,7 +141,7 @@ export default function FeaturedProducts() {
         }
       `}</style>
 
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-2 sm:px-4">
         <div
           ref={loadPreviousBarRef}
           onMouseEnter={handleMouseEnter}
@@ -145,9 +157,9 @@ export default function FeaturedProducts() {
           </Button>
         </div>
 
-        <div className="text-center mb-12 section-title-animate">
-          <h2 className="font-headline text-4xl font-bold">Featured Products</h2>
-          <p className="mt-4 text-lg text-muted-foreground">A selection of our finest items, just for you.</p>
+        <div className={cn("text-center mb-8 md:mb-12", !wasRestored && "section-title-animate")}>
+          <h2 className="font-headline text-3xl md:text-4xl font-bold">Featured Products</h2>
+          <p className="mt-2 md:mt-4 text-base md:text-lg text-muted-foreground">A selection of our finest items, just for you.</p>
         </div>
 
         {isLoading && products.length === 0 ? (
@@ -157,10 +169,10 @@ export default function FeaturedProducts() {
             id="featured-grid-container"
             className="relative"
           >
-            <div ref={gridRef} id="featured-grid" className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            <div ref={gridRef} id="featured-grid" className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
               {products.map((p, i) => (
-                <div key={p.id} className="product-card-animate">
-                  <ProductCard product={p} priority={i < 10} />
+                <div key={p.id} className={cn("product-card-animate", (isRestoring || wasRestored) && "product-card-visible")}>
+                  <ProductCard product={p} priority={isRestoring || i < 10} />
                 </div>
               ))}
             </div>

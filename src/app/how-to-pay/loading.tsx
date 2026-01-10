@@ -1,15 +1,6 @@
+import { Skeleton } from "@/components/ui/skeleton";
 
-"use client";
-
-import dynamic from 'next/dynamic';
-import { Skeleton } from '@/components/ui/skeleton';
-
-const HowToPayClient = dynamic(() => import('./how-to-pay-client'), {
-  ssr: false,
-  loading: () => <HowToPayPageSkeleton />,
-});
-
-function HowToPayPageSkeleton() {
+export default function Loading() {
     return (
         <div className="container mx-auto px-4 py-12">
             <div className="max-w-4xl mx-auto">
@@ -28,8 +19,4 @@ function HowToPayPageSkeleton() {
             </div>
         </div>
     );
-}
-
-export default function HowToPayLoader() {
-    return <HowToPayClient />;
 }
